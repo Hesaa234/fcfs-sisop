@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-main() {
+int main() {
     // n = banyak proses, AT = Arrival Time, WT = Waiting Time, TAT = TurnAround Time
     // b = burst time, TotWT = Total Waiting Time, TotTA = Total TurnAround time
     // name = nama proses, AvWT = Average Waiting Time, AvTA = Average TurnAround time
@@ -22,12 +22,15 @@ main() {
     for (i = 0; i < n; i++) {
         fflush(stdin);
 
+        // KOREKSI: Tanda kutip lurus ("") dan hilangkan & pada array char name[i]
         printf("Nama Proses\t= ");
-        scanf("%s", name[i]); // Menghapus & pada array char
-        
+        scanf("%s", name[i]);
+
+        // KOREKSI: Tanda kutip lurus ("")
         printf("Arrival time\t= ");
         scanf("%d", &AT[i]);
-        
+
+        // KOREKSI: Tanda kutip lurus ("")
         printf("Burst time\t= ");
         scanf("%d", &b[i]);
         puts("");
@@ -64,15 +67,14 @@ main() {
 
     for (i = 0; i < n; i++) {
         printf("| %2d | %s\t | \t%d\t | %d\t |\n", i + 1, name[i], AT[i], b[i]);
-
-        // Menghitung time pada gant chart (waktu penyelesaian proses sebelumnya)
-        // time[i] = Waktu Mulai (Start Time) proses ke-i
+        
+        // menghitung time pada gant chart
         time[i + 1] = time[i] + b[i]; 
         
-        // Waiting Time = Waktu Mulai - Waktu Kedatangan
+        // Waiting Time
         WT[i] = time[i] - AT[i];
         
-        // Turn Around Time = Waktu Selesai (time[i+1]) - Waktu Kedatangan
+        // Turn Around Time
         TAT[i] = time[i + 1] - AT[i];
         
         TotWT += WT[i];
@@ -126,4 +128,6 @@ main() {
 
     printf("\tAverage Waiting Time\t: %f\n", AvWT);
     printf("\tAverage Turn Around Time\t: %f\n", AvTA);
+    
+    return 0; // Tambahan return 0 agar sesuai dengan int main()
 }
