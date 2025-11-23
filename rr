@@ -1,0 +1,98 @@
+#include <stdio.h>
+
+int main() {
+    int i, n, time = 0, remain, flag = 0, tq;
+    int total_wait_time = 0, total_turnaround_time = 0;
+    // AT: Arrival Time, bt: Burst Time, rt: Remaining Time
+    int arrival_time[100], burst_time[100], remaining_time[100];
+
+    printf("Masukkan jumlah proses (maks 100): ");
+    // Menggunakan &n, seperti pada kode asli.
+    if (scanf("%d", &n) != 1 || n <= 0 || n > 100) {
+        printf("Input jumlah proses tidak valid.\n");
+        return 1;
+    }
+
+    remain = n;
+
+    printf("\nMasukkan Arrival Time dan Burst Time untuk setiap proses:\n");
+    for (i = 0; i < n; i++) {
+        printf("Process P[%d]\n", i + 1);
+        printf("  Arrival Time (AT): ");
+        if (scanf("%d", &arrival_time[i]) != 1 || arrival_time[i] < 0) {
+            printf("Input AT tidak valid.\n");
+            return 1;
+        }
+        printf("  Burst Time (BT): ");
+        if (scanf("%d", &burst_time[i]) != 1 || burst_time[i] <= 0) {
+            printf("Input BT tidak valid.\n");
+            return 1;
+        }
+        // Inisialisasi Remaining Time sama dengan Burst Time
+        remaining_time[i] = burst_time[i];
+    }
+
+    printf("\nMasukkan Quantum Waktu (Time Quantum - TQ): ");
+    if (scanf("%d", &tq) != 1 || tq <= 0) {
+        printf("Input TQ tidak valid.\n");
+        return 1;
+    }
+
+    printf("\n--- Hasil Penjadwalan Round Robin ---\n");
+    printf("Proses\t|  Turnaround Time\t|  Waiting Time\n");
+    printf("-------------------------------------------------\n");
+
+    // Loop utama Round Robin
+    for (i = 0; remain != 0;) {
+        // Kasus 1: Proses selesai dalam satu quantum waktu atau kurang
+        if (remaining_time[i] <= tq && remaining_time[i] > 0) {
+            time += remaining_time[i];
+            remaining_time[i] = 0;
+            flag = 1; // Menandakan proses telah selesai
+        }
+        // Kasus 2: Proses membutuhkan lebih dari satu quantum waktu
+        else if (remaining_time[i] > 0) {
+            remaining_time[i] -= tq;
+            time += tq;
+        }
+
+        // Jika proses telah selesai (remaining_time[i] == 0 dan flag == 1)
+        if (remaining_time[i] == 0 && flag == 1) {
+            remain--; // Kurangi jumlah proses yang tersisa
+            
+            // Perhitungan Turnaround Time (TA) dan Waiting Time (WT)
+            int turnaround_time = time - arrival_time[i];
+            int waiting_time = turnaround_time - burst_time[i];
+
+            printf("P[%d]\t|\t%d\t\t|\t%d\n", 
+                   i + 1, 
+                   turnaround_time, 
+                   waiting_time);
+            
+            total_wait_time += waiting_time;
+            total_turnaround_time += turnaround_time;
+            flag = 0; // Reset flag
+        }
+
+        // Logika penentuan proses selanjutnya
+        // Jika proses saat ini adalah proses terakhir (i == n-1)
+        if (i == n - 1) {
+            i = 0; // Kembali ke proses pertama
+        } 
+        // Jika proses berikutnya (i+1) sudah tiba (AT[i+1] <= time)
+        else if (arrival_time[i + 1] <= time) {
+            i++; // Pindah ke proses berikutnya
+        } 
+        // Jika proses berikutnya belum tiba, kembali ke proses pertama (untuk mencari proses yang sudah tiba)
+        else {
+            i = 0;
+        }
+    }
+
+    // Perhitungan Rata-rata
+    printf("-------------------------------------------------\n");
+    printf("Average Waiting Time = %.2f\n", (float)total_wait_time / n);
+    printf("Average Turnaround Time = %.2f\n", (float)total_turnaround_time / n);
+
+    return 0;
+}
